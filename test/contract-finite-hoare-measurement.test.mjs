@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test, { after, before } from "node:test";
 
-import { startRwilProviderProcess } from "@lenticule-science/rwil-rdf-projection-service/test-provider";
+import { startRwilProviderProcess } from "@lenticule-science/witness-journal-rdf-projection-service/test-provider";
 
 import { measureFiniteHoareProgram, run, semanticDigest } from "../src/contract-finite-hoare-measurement.mjs";
 import { FINITE_HOARE_PROGRAM_MEASUREMENT_CONTRACT } from "../src/law.mjs";
@@ -73,7 +73,7 @@ test("the exact RMN law closes with typed resources and RWIL evidence", async (t
     ["assetAmount", "computeSeconds", "erasure", "gas", "type", "wallTimeSeconds", "wit"].sort());
   const graphDirectory = join(root, "rwil", "2026", "07", "18");
   assert.equal(readdirSync(graphDirectory).length >= 3, true);
-  assert.equal(readFileSync(join(graphDirectory, readdirSync(graphDirectory)[0]), "utf8").includes("urn:emsenn:rwil:category"), true);
+  assert.equal(readFileSync(join(graphDirectory, readdirSync(graphDirectory)[0]), "utf8").includes("urn:emsenn:witness-journal:category"), true);
 });
 
 test("changed terms and overbroad capabilities are refused before measurement", async (t) => {

@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 
 import { semanticId } from "@red-cup-engineering/rmn-semantic-conformance";
 import { encodeRelationalValue } from "@red-cup-engineering/rmn-semantic-conformance/relational-value";
-import { createSettlementStore } from "@lenticule-science/rwil-rdf-projection-service/client";
+import { createSettlementStore } from "@lenticule-science/witness-journal-rdf-projection-service/client";
 
 import { FINITE_HOARE_PROGRAM_MEASUREMENT_CONTRACT, FORMAL_HOARE_CARRIER_CONTRACT } from "./law.mjs";
 
