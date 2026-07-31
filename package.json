@@ -20,8 +20,8 @@
     "verify": "npm run check"
   },
   "dependencies": {
-    "@red-cup-engineering/rmn-semantic-conformance": "6.0.1",
-    "@lenticule-science/rwil-rdf-projection-service": "1.0.2"
+    "@lenticule-science/rwil-rdf-projection-service": "1.0.2",
+    "@red-cup-engineering/rmn-semantic-conformance": "^6.0.1"
   },
   "license": "UNLICENSED"
 }
