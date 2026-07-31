@@ -1,0 +1,50 @@
+{
+  "kind": "metroplat.contract",
+  "id": "finite-hoare-program-measurement",
+  "material": {
+    "id": "finite-hoare-program-measurement-material",
+    "loci": ["consuming-enterprise", "hoare-program-measurement", "obsmetrologia-mathematical-supplier"],
+    "incidence": [
+      "consumer--offers-a-source-digested-finite-program-model-and-observation-packet-to--hoare-program-measurement",
+      "hoare-program-measurement--authors-an-immutable-bounded-offer-and-capability-to--consumer",
+      "hoare-program-measurement--computes-a-qualified-model-and-observation-readout-without-writing--consumer",
+      "hoare-program-measurement--references-but-does-not-write--obsmetrologia-mathematical-supplier"
+    ],
+    "fibers": ["program-model", "observation-packet", "authority-attestation", "measurement", "refusal", "receipt", "provider-book-entry"],
+    "valueAlgebra": "boolean-with-explicit-counterexample-carrier",
+    "constraints": [
+      "the-program-relation-is-finite-and-has-at-least-one-terminating-output-for-every-precondition-state",
+      "the-model-readout-is-exhaustive-only-over-the-customer-supplied-relation",
+      "observation-truth-provenance-and-deployment-semantics-remain-customer-owned-and-unverified",
+      "no-result-authorizes-mutation-of-the-customer-or-obsmetrologia"
+    ],
+    "closure": ["every-admitted-invocation-closes-as-qualified-completion-or-typed-refusal"],
+    "boundary": ["the-activitystreams-solicitation-is-the-only-admitted-inter-enterprise-ingress"]
+  },
+  "precondition": {
+    "id": "finite-program-measurement-admitted",
+    "description": "A consumer has offered a request conforming to emsenn/schema/finite-hoare-program-measurement-request, accepted the provider-authored reciprocal-value term, and supplied a capability attenuated to the exact request digest, invoke-service method, and provider-local-write effect."
+  },
+  "move": {
+    "id": "measure-finite-hoare-program",
+    "description": "The provider exhaustively inspects transitions from the declared precondition, returns preservation and counterexample counts and the weakest compatible input set over the supplied finite relation, compares source-digested customer observations to the declared model and postcondition, qualifies the evidence boundary, and records its own measurement, receipt, book, events, ActivityStreams, and EAVT facts.",
+    "domain": "admitted-finite-program-model-and-observations",
+    "codomain": "qualified-measurement-or-typed-refusal",
+    "partial": false,
+    "deterministic": false,
+    "effects": ["provider-local-records", "provider-local-resource-measurement"]
+  },
+  "postcondition": {
+    "id": "finite-program-measurement-settled",
+    "description": "The provider's dated append-only pools carry exactly one qualified result or refusal plus causal evidence; a completion preserves the exact request digest, customer authority assertion, formal-carrier digest and evidence limitations, and no other settlement's state is changed."
+  },
+  "evidencePolicy": {
+    "required": true,
+    "records": ["ActivityStreams ingress, provider offer, invocation, and result or refusal", "CloudEvent-shaped provider event and EAVT projection", "provider-local measurement record", "bilateral receipt and seller-side book entry", "exact request and formal-carrier SHA-256 digests", "CPU and wall-time observations in their own unsettled denomination"]
+  },
+  "boundary": {
+    "customerOwned": ["program identity and semantics", "observation truth and provenance", "authority assertion", "deployment", "customer books"],
+    "providerOwned": ["admission", "finite-relation measurement", "qualification", "provider records", "provider refusal"],
+    "supplierOwned": ["Obsmetrologia declarations, source, history, and mathematical admission"]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "@lenticule-science/finite-program-measurement-service",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Measures an explicitly supplied finite total relation against optional source-digested, customer-authored observations, then appends its own result, receipt, book, event, ActivityStreams, and EAVT evidence. Use when a customer needs an exhaustive finite-model measurement over its own supplied relation without formal Lean proof and without any independent verification of the supplied observations.",
+  "keywords": [
+    "hoare-program",
+    "measurement",
+    "micro-enterprise",
+    "lenticule-science"
+  ],
+  "bin": {
+    "solicit-service": "./src/contract-finite-hoare-measurement.mjs",
+    "invoke-service": "./src/contract-finite-hoare-measurement.mjs"
+  },
+  "scripts": {
+    "test": "node --test test/contract-finite-hoare-measurement.test.mjs",
+    "check": "node src/verify-enterprise.mjs && node --check src/law.mjs && node --check src/contract-finite-hoare-measurement.mjs && node --test test/contract-finite-hoare-measurement.test.mjs",
+    "verify": "npm run check"
+  },
+  "dependencies": {
+    "@red-cup-engineering/rmn-semantic-conformance": "6.0.1",
+    "@lenticule-science/rwil-rdf-projection-service": "1.0.2"
+  },
+  "license": "UNLICENSED"
+}

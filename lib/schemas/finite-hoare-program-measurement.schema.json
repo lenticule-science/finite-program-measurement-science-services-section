@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "emsenn/schema/finite-hoare-program-measurement",
+  "title": "finite-hoare-program-measurement",
+  "$comment": "A qualified readout over one admitted finite program relation and optional customer-authored observation packet. It never promotes asserted provenance into truth without exact attributable replay evidence.",
+  "type": "object",
+  "required": ["type", "law", "programId", "requestDigest", "semantics", "model", "observations", "qualification", "customerAuthority", "customerMutation", "foreignMutation"],
+  "additionalProperties": false,
+  "properties": {
+    "type": { "const": "FiniteHoareProgramMeasurement" },
+    "law": { "const": "ni:///sha-256;LZyMHrqZcbFB-_uMtGuAkKHKKLYP-hWamfCfWI9xkGw" },
+    "programId": { "type": "string", "minLength": 1 },
+    "requestDigest": { "type": "string", "pattern": "^ni:///sha-256;[A-Za-z0-9_-]{43}$" },
+    "semantics": { "const": "finite-total-relation" },
+    "model": { "$ref": "#/$defs/model" },
+    "observations": { "$ref": "#/$defs/observations" },
+    "qualification": {
+      "type": "object",
+      "required": ["exhaustiveScope", "observationScope", "observationTruth", "deploymentClaim", "formalCarrier"],
+      "additionalProperties": false,
+      "properties": {
+        "exhaustiveScope": { "type": "string", "minLength": 1 },
+        "observationScope": { "type": "string", "minLength": 1 },
+        "observationTruth": { "const": "not verified from replay evidence by this service" },
+        "deploymentClaim": { "const": "none" },
+        "formalCarrier": { "type": "object" }
+      }
+    },
+    "customerAuthority": { "type": "object" },
+    "customerMutation": { "const": false },
+    "foreignMutation": { "const": false }
+  },
+  "$defs": {
+    "model": {
+      "type": "object",
+      "required": ["stateCount", "transitionCount", "preconditionStateCount", "postconditionStateCount", "assessedTransitionCount", "preservingTransitionCount", "violationCount", "preservesPostcondition", "violations", "weakestCompatiblePrecondition"],
+      "additionalProperties": false,
+      "properties": {
+        "stateCount": { "type": "integer", "minimum": 0 },
+        "transitionCount": { "type": "integer", "minimum": 0 },
+        "preconditionStateCount": { "type": "integer", "minimum": 0 },
+        "postconditionStateCount": { "type": "integer", "minimum": 0 },
+        "assessedTransitionCount": { "type": "integer", "minimum": 0 },
+        "preservingTransitionCount": { "type": "integer", "minimum": 0 },
+        "violationCount": { "type": "integer", "minimum": 0 },
+        "preservesPostcondition": { "type": "boolean" },
+        "violations": { "type": "array", "items": { "type": "object" } },
+        "weakestCompatiblePrecondition": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "observations": {
+      "type": "object",
+      "required": ["suppliedCount", "admittedPreconditionCount", "postconditionViolationCount", "observationViolations", "outOfModelCount", "outOfModelObservationIds", "declaredTransitionPairCoverage"],
+      "additionalProperties": false,
+      "properties": {
+        "suppliedCount": { "type": "integer", "minimum": 0 },
+        "admittedPreconditionCount": { "type": "integer", "minimum": 0 },
+        "postconditionViolationCount": { "type": "integer", "minimum": 0 },
+        "observationViolations": { "type": "array", "items": { "type": "object" } },
+        "outOfModelCount": { "type": "integer", "minimum": 0 },
+        "outOfModelObservationIds": { "type": "array", "items": { "type": "string" } },
+        "declaredTransitionPairCoverage": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    }
+  }
+}

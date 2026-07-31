@@ -1,0 +1,22 @@
+{
+  "id": "finite-hoare-program-measurement",
+  "law": "ni:///sha-256;LZyMHrqZcbFB-_uMtGuAkKHKKLYP-hWamfCfWI9xkGw",
+  "provider": "hoare-program-measurement",
+  "status": "available-local-carrier",
+  "serviceForm": "ActivityStreams request/offer/accept/result over process standard input, with provider-local append-only evidence",
+  "serviceLevel": "nation",
+  "purpose": "Measure preservation, counterexamples, compatible input states, supplied observation conformance, and finite-model coverage for an explicitly supplied finite total relation outside the primary mathematics library.",
+  "operations": ["solicit-service", "invoke-service", "measure-finite-program-relation", "measure-customer-authored-observation-packet", "issue-provider-rwil-receipt", "issue-typed-refusal"],
+  "admission": "An ActivityStreams solicitation carrying the exact local request schema, explicit finite-total-relation model, source-digested observations if any, and customer authority and sensitive-data-exclusion attestations.",
+  "refusal": [
+    "malformed or non-total-on-precondition finite relation",
+    "state references outside the declared vocabulary",
+    "missing observation provenance digest or customer authority",
+    "altered provider-authored normalized request or terms",
+    "overbroad capability or customer-write authority",
+    "a request to promote supplied observations into truth without exact attributable replay evidence",
+    "a request to add the carrier or service to Obsmetrologia"
+  ],
+  "qualification": "The model result is exhaustive only over the supplied finite relation. Observation results concern customer-authored records and do not verify the deployed system, observation source, or authority assertion.",
+  "unavailableOperations": ["direct deployed-program instrumentation", "independent observation-source verification", "ActivityPub network transport", "public HTTP operation", "monetary or x402 settlement"]
+}

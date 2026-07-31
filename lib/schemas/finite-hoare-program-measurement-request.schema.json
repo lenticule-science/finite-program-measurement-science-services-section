@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "emsenn/schema/finite-hoare-program-measurement-request",
+  "title": "finite-hoare-program-measurement-request",
+  "$comment": "JSON wire validation for the finite relation and customer-authored observation packet governed by the normalized RMN law in content/contracts/finite-hoare-program-measurement.rml. Cross-field subset, endpoint, and totality-on-precondition rules are enforced by the provider operation.",
+  "type": "object",
+  "required": ["programId", "semantics", "states", "precondition", "postcondition", "transitions", "authority"],
+  "additionalProperties": false,
+  "properties": {
+    "programId": { "type": "string", "minLength": 1 },
+    "semantics": { "const": "finite-total-relation" },
+    "states": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "precondition": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "postcondition": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "transitions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "from", "to"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "from": { "type": "string", "minLength": 1 },
+          "to": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "input", "output", "observedAt", "sourceDigest"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "input": { "type": "string", "minLength": 1 },
+          "output": { "type": "string", "minLength": 1 },
+          "observedAt": { "type": "string", "format": "date-time" },
+          "sourceDigest": { "type": "string", "pattern": "^ni:///sha-256;[A-Za-z0-9_-]{43}$" }
+        }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "required": ["controller", "basis", "customerOwnsObservations", "sensitiveDataExcluded"],
+      "additionalProperties": false,
+      "properties": {
+        "controller": { "type": "string", "minLength": 1 },
+        "basis": { "type": "string", "minLength": 1 },
+        "customerOwnsObservations": { "const": true },
+        "sensitiveDataExcluded": { "const": true }
+      }
+    }
+  }
+}
