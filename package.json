@@ -16,7 +16,7 @@
   },
   "scripts": {
     "test": "node --test test/contract-finite-hoare-measurement.test.mjs",
-    "check": "node src/verify-enterprise.mjs && node --check src/law.mjs && node --check src/contract-finite-hoare-measurement.mjs && node --test test/contract-finite-hoare-measurement.test.mjs",
+    "check": "node src/verify-enterprise.mjs && node --check src/contract-finite-hoare-measurement.mjs && node --test test/contract-finite-hoare-measurement.test.mjs",
     "verify": "npm run check"
   },
   "dependencies": {

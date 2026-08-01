@@ -3,7 +3,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { FINITE_HOARE_PROGRAM_MEASUREMENT_CONTRACT } from "./law.mjs";
 
 // Split 2026-07-30 from the former combined `hoare-program-measurement`
 // enterprise: this audits only the application/finite half now seated in
@@ -18,7 +17,6 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const required = [
   "AGENTS.md",
   "content/services/finite-hoare-program-measurement.json",
-  "content/contracts/finite-hoare-program-measurement.rml",
   "lib/schemas/finite-hoare-program-measurement-request.schema.json",
   "lib/schemas/finite-hoare-program-measurement.schema.json",
   "src/contract-finite-hoare-measurement.mjs",
@@ -37,14 +35,6 @@ if (enterprise?.["node-id"] !== "finite-program-measurement-service") failures.p
 if (!enterprise?.["unimplemented-operations"]?.includes("direct-deployed-program-instrumentation")) {
   failures.push("direct deployed-program instrumentation absence is not disclosed");
 }
-const measurementService = JSON.parse(readFileSync(join(ROOT, "content/services/finite-hoare-program-measurement.json"), "utf8"));
-if (measurementService.law !== FINITE_HOARE_PROGRAM_MEASUREMENT_CONTRACT) failures.push("measurement service does not bind its exact normalized RMN law");
-for (const operation of ["solicit-service", "invoke-service"]) {
-  if (enterprise?.["operation-catalog"]?.[operation]?.contract !== FINITE_HOARE_PROGRAM_MEASUREMENT_CONTRACT) {
-    failures.push(`${operation} does not bind the exact normalized RMN law`);
-  }
-}
-
 for (const path of [
   "lib/schemas/finite-hoare-program-measurement-request.schema.json",
   "lib/schemas/finite-hoare-program-measurement.schema.json",

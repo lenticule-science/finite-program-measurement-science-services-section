@@ -7,7 +7,6 @@ import test, { after, before } from "node:test";
 import { startWitnessJournalProviderProcess } from "@lenticule-science/witness-journal-rdf-projection-service/test-provider";
 
 import { measureFiniteHoareProgram, run, semanticDigest } from "../src/contract-finite-hoare-measurement.mjs";
-import { FINITE_HOARE_PROGRAM_MEASUREMENT_CONTRACT } from "../src/law.mjs";
 
 const CONTEXT = "https://www.w3.org/ns/activitystreams";
 const PROVIDER = "urn:ame:hoare-program-measurement";
@@ -29,11 +28,11 @@ function request(overrides = {}) {
 }
 function solicitation(measurementRequest = request()) {
   return { "@context": CONTEXT, id: "urn:test:hoare-solicitation", type: "Offer", actor: BUYER, target: PROVIDER,
-    object: { type: "ServiceSolicitation", contract: FINITE_HOARE_PROGRAM_MEASUREMENT_CONTRACT, request: measurementRequest } };
+    object: { type: "ServiceSolicitation", request: measurementRequest } };
 }
 function acceptance(offer, overrides = {}) {
   return { "@context": CONTEXT, id: "urn:test:hoare-acceptance", type: "Accept", actor: BUYER, target: PROVIDER,
-    object: { type: "ServiceContract", law: FINITE_HOARE_PROGRAM_MEASUREMENT_CONTRACT, offer,
+    object: { type: "ServiceContract", offer,
       termsAcceptance: { termDigest: offer.object.termsDigest },
       capability: { type: "Capability", holder: PROVIDER, invocationTarget: PROVIDER, parentOffer: offer.id,
         attenuation: { requestDigest: offer.object.requestDigest }, capTP: { target: PROVIDER, method: "invoke-service" },

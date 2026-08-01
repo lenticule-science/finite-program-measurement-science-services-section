@@ -8,14 +8,11 @@ import { semanticId } from "@red-cup-engineering/rmn-semantic-conformance";
 import { encodeRelationalValue } from "@red-cup-engineering/rmn-semantic-conformance/relational-value";
 import { createSettlementStore } from "@lenticule-science/witness-journal-rdf-projection-service/client";
 
-import { FINITE_HOARE_PROGRAM_MEASUREMENT_CONTRACT, FORMAL_HOARE_CARRIER_CONTRACT } from "./law.mjs";
-
 const CONTEXT = "https://www.w3.org/ns/activitystreams";
 const ACTOR = "urn:ame:hoare-program-measurement";
 const NODE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const EFFECTS = ["provider-local-witness-journal-evidence"];
 const FORMAL_CARRIER = {
-  law: FORMAL_HOARE_CARRIER_CONTRACT,
   file: "HoareProgramMeasurement/Program.lean",
   source: "ni:///sha-256;5QKTj0THwa4B4Lw1SGDlCQVwYDLnCTZR47UMO9luXXM",
   relationship: "The runtime readout implements a separate finite-relation measurement law; this identity names the generic formal carrier but does not prove implementation equivalence.",
@@ -36,15 +33,14 @@ function operation() {
 function instant() { const index = process.argv.indexOf("--now"); return index >= 0 ? process.argv[index + 1] : new Date().toISOString(); }
 function response(type, source, object, at) {
   return identify({ "@context": CONTEXT, type, actor: ACTOR, target: source?.actor ?? null,
-    inReplyTo: source?.id ?? null, law: FINITE_HOARE_PROGRAM_MEASUREMENT_CONTRACT, object, published: at });
+    inReplyTo: source?.id ?? null, object, published: at });
 }
 async function append(store, category, record) {
   await store.record({ category: `finite-hoare-program-measurement-${category}`,
     recordedAt: record.published ?? record.recordedAt, record });
 }
 async function reject(store, source, reason, at, unmet = []) {
-  const value = response("Reject", source, { type: "FiniteHoareProgramMeasurementRefusal",
-    law: FINITE_HOARE_PROGRAM_MEASUREMENT_CONTRACT, reason, unmet,
+  const value = response("Reject", source, { type: "FiniteHoareProgramMeasurementRefusal", reason, unmet,
     prohibitedEffectsPerformed: false, customerMutation: false, foreignMutation: false }, at);
   await append(store, "refusals", value); return value;
 }
@@ -136,7 +132,7 @@ export function measureFiniteHoareProgram(request) {
   const observedDeclaredPairs = new Set(observations.map((observation) => `${observation.input}\u0000${observation.output}`)
     .filter((pair) => declaredPairs.has(pair)));
   return {
-    type: "FiniteHoareProgramMeasurement", law: FINITE_HOARE_PROGRAM_MEASUREMENT_CONTRACT,
+    type: "FiniteHoareProgramMeasurement",
     programId: request.programId, requestDigest: semanticDigest(request), semantics: request.semantics,
     model: { stateCount: request.states.length, transitionCount: request.transitions.length,
       preconditionStateCount: request.precondition.length, postconditionStateCount: request.postcondition.length,
@@ -157,17 +153,16 @@ function solicitationProblems(activity) {
       || activity.object?.type !== "ServiceSolicitation") {
     return ["solicitation must be an ActivityStreams Offer<ServiceSolicitation> addressed to Hoare Program Measurement"];
   }
-  if (activity.object.contract !== FINITE_HOARE_PROGRAM_MEASUREMENT_CONTRACT) return ["solicitation must name the exact normalized RMN law"];
   return requestProblems(activity.object.request);
 }
 async function solicit(store, activity, at) {
   const problems = solicitationProblems(activity);
   if (problems.length) return reject(store, activity, `invalid-solicitation:${problems.join(",")}`, at, problems);
   const request = structuredClone(activity.object.request);
-  const terms = { type: "UnpricedServiceTerms", law: FINITE_HOARE_PROGRAM_MEASUREMENT_CONTRACT,
+  const terms = { type: "UnpricedServiceTerms",
     assetPaymentRequired: false, resourceMeasures: ["compute-seconds", "wall-time-seconds"],
     witInterchangeabilityClaimed: false, erasureInterchangeabilityClaimed: false, gasInterchangeabilityClaimed: false };
-  const object = { type: "ExecutableServiceOffer", law: FINITE_HOARE_PROGRAM_MEASUREMENT_CONTRACT,
+  const object = { type: "ExecutableServiceOffer",
     sourceActivity: activity.id, request, requestDigest: semanticDigest(request), terms, termsDigest: semanticDigest(terms),
     operation: "invoke-service", effects: EFFECTS,
     evidence: ["provider-local-witness-journal-evidence", "typed-resource-measures", "completion-or-typed-refusal"] };
@@ -176,10 +171,9 @@ async function solicit(store, activity, at) {
 function invocationProblem(activity) {
   if (activity?.["@context"] !== CONTEXT || activity.type !== "Accept" || activity.target !== ACTOR) return "invocation must be an ActivityStreams Accept addressed to Hoare Program Measurement";
   const contract = activity.object; const offer = contract?.offer;
-  if (contract?.type !== "ServiceContract" || contract.law !== FINITE_HOARE_PROGRAM_MEASUREMENT_CONTRACT) return "invocation must accept the exact normalized RMN law";
-  if (offer?.type !== "Offer" || offer.actor !== ACTOR || offer.law !== FINITE_HOARE_PROGRAM_MEASUREMENT_CONTRACT
-      || !contentValid(offer) || offer.object?.type !== "ExecutableServiceOffer"
-      || offer.object.law !== FINITE_HOARE_PROGRAM_MEASUREMENT_CONTRACT) return "ServiceContract must carry this provider's exact authored offer";
+  if (contract?.type !== "ServiceContract") return "invocation must accept the exact normalized RMN law";
+  if (offer?.type !== "Offer" || offer.actor !== ACTOR
+      || !contentValid(offer) || offer.object?.type !== "ExecutableServiceOffer") return "ServiceContract must carry this provider's exact authored offer";
   if (offer.object.requestDigest !== semanticDigest(offer.object.request)) return "accepted request differs from provider-authored term";
   if (offer.object.termsDigest !== semanticDigest(offer.object.terms)
       || contract.termsAcceptance?.termDigest !== offer.object.termsDigest) return "customer did not accept the provider-authored terms";
@@ -199,14 +193,13 @@ async function invoke(store, activity, at) {
   const cpu = process.cpuUsage(startCpu);
   const resources = { type: "TypedResourceVector", computeSeconds: (cpu.user + cpu.system) / 1e6,
     wallTimeSeconds: Number(process.hrtime.bigint() - startWall) / 1e9, assetAmount: null, wit: null, erasure: null, gas: null };
-  const exchange = identify({ type: "FiniteHoareProgramMeasurementExchange", law: FINITE_HOARE_PROGRAM_MEASUREMENT_CONTRACT,
+  const exchange = identify({ type: "FiniteHoareProgramMeasurementExchange",
     outcome: "completion", request: offer.object.request, measurement, resources, recordedAt: at,
     customerMutation: false, foreignMutation: false });
-  const receipt = identify({ type: "ServicePerformanceReceipt", law: FINITE_HOARE_PROGRAM_MEASUREMENT_CONTRACT,
+  const receipt = identify({ type: "ServicePerformanceReceipt",
     provider: ACTOR, customer: activity.actor, offer: offer.id, invocation: activity.id,
     fulfillment: exchange.id, outcome: exchange.outcome, recordedAt: at, assetSettlementClaimed: false });
-  const result = response("Accept", activity, { type: "HoareProgramMeasurementResult",
-    law: FINITE_HOARE_PROGRAM_MEASUREMENT_CONTRACT, exchange, receipt, customerMutation: false, foreignMutation: false }, at);
+  const result = response("Accept", activity, { type: "HoareProgramMeasurementResult", exchange, receipt, customerMutation: false, foreignMutation: false }, at);
   await append(store, "measurements", exchange); await append(store, "receipts", receipt); await append(store, "results", result);
   return result;
 }
