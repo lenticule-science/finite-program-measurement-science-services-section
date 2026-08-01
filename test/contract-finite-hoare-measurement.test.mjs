@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test, { after, before } from "node:test";
 
-import { startRwilProviderProcess } from "@lenticule-science/witness-journal-rdf-projection-service/test-provider";
+import { startWitnessJournalProviderProcess } from "@lenticule-science/witness-journal-rdf-projection-service/test-provider";
 
 import { measureFiniteHoareProgram, run, semanticDigest } from "../src/contract-finite-hoare-measurement.mjs";
 import { FINITE_HOARE_PROGRAM_MEASUREMENT_CONTRACT } from "../src/law.mjs";
@@ -13,10 +13,10 @@ const CONTEXT = "https://www.w3.org/ns/activitystreams";
 const PROVIDER = "urn:ame:hoare-program-measurement";
 const BUYER = "urn:ame:test-customer";
 const AT = "2026-07-18T15:00:00.000Z";
-let rwil;
+let witnessJournal;
 
-before(async () => { rwil = await startRwilProviderProcess(); });
-after(async () => { await rwil?.close(); });
+before(async () => { witnessJournal = await startWitnessJournalProviderProcess(); });
+after(async () => { await witnessJournal?.close(); });
 
 function request(overrides = {}) {
   return { programId: "door-controller-v1", semantics: "finite-total-relation",
@@ -37,10 +37,10 @@ function acceptance(offer, overrides = {}) {
       termsAcceptance: { termDigest: offer.object.termsDigest },
       capability: { type: "Capability", holder: PROVIDER, invocationTarget: PROVIDER, parentOffer: offer.id,
         attenuation: { requestDigest: offer.object.requestDigest }, capTP: { target: PROVIDER, method: "invoke-service" },
-        allowedActions: ["invoke-service", "provider-local-rwil-evidence"] }, ...overrides } };
+        allowedActions: ["invoke-service", "provider-local-witness-journal-evidence"] }, ...overrides } };
 }
 async function execute(activity, operation, root) {
-  return run(activity, operation, AT, { dataRoot: root, agentUrl: rwil.agentCardUrl });
+  return run(activity, operation, AT, { dataRoot: root, agentUrl: witnessJournal.agentCardUrl });
 }
 
 test("finite program measurement reports bounded model and observation evidence", () => {
@@ -60,7 +60,7 @@ test("a counterexample is measured rather than repaired or hidden", () => {
   assert.deepEqual(result.model.weakestCompatiblePrecondition, ["closed"]);
 });
 
-test("the exact RMN law closes with typed resources and RWIL evidence", async (t) => {
+test("the exact RMN law closes with typed resources and WitnessJournal evidence", async (t) => {
   const root = mkdtempSync(join(tmpdir(), "hoare-measurement-provider-test-")); t.after(() => rmSync(root, { recursive: true, force: true }));
   const offer = await execute(solicitation(), "solicit-service", root);
   assert.equal(offer.type, "Offer"); assert.equal(offer.object.requestDigest, semanticDigest(offer.object.request));
@@ -71,7 +71,7 @@ test("the exact RMN law closes with typed resources and RWIL evidence", async (t
   assert.equal(result.object.receipt.assetSettlementClaimed, false); assert.equal(result.object.customerMutation, false);
   assert.deepEqual(Object.keys(result.object.exchange.resources).sort(),
     ["assetAmount", "computeSeconds", "erasure", "gas", "type", "wallTimeSeconds", "wit"].sort());
-  const graphDirectory = join(root, "rwil", "2026", "07", "18");
+  const graphDirectory = join(root, "witnessJournal", "2026", "07", "18");
   assert.equal(readdirSync(graphDirectory).length >= 3, true);
   assert.equal(readFileSync(join(graphDirectory, readdirSync(graphDirectory)[0]), "utf8").includes("urn:emsenn:witness-journal:category"), true);
 });
@@ -95,6 +95,6 @@ test("missing observation authority and non-ni evidence are typed refusals", asy
   assert.equal(nonstandard.type, "Reject"); assert.match(nonstandard.object.reason, /RFC6920/);
 });
 
-test("absence of the hired RWIL provider fails closed", async () => {
-  await assert.rejects(run(solicitation(), "solicit-service", AT, { dataRoot: mkdtempSync(join(tmpdir(), "hoare-no-rwil-")) }), /RWIL_RDF_AGENT/u);
+test("absence of the hired WitnessJournal provider fails closed", async () => {
+  await assert.rejects(run(solicitation(), "solicit-service", AT, { dataRoot: mkdtempSync(join(tmpdir(), "hoare-no-witness-journal-")) }), /WITNESS_JOURNAL_RDF_AGENT/u);
 });
