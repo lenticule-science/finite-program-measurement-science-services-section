@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import test, { after, before } from "node:test";
+import test from "node:test";
 
-import { startWitnessJournalProviderProcess } from "@red-cup-engineering/witness-journal-rdf-projection-service/test-provider";
+import { logPathFor, readEntriesAtPath } from "@red-cup-engineering/witness-journal-log-service";
 
 import { measureFiniteHoareProgram, run, semanticDigest } from "../src/contract-finite-hoare-measurement.mjs";
 
@@ -12,10 +12,6 @@ const CONTEXT = "https://www.w3.org/ns/activitystreams";
 const PROVIDER = "urn:ame:hoare-program-measurement";
 const BUYER = "urn:ame:test-customer";
 const AT = "2026-07-18T15:00:00.000Z";
-let witnessJournal;
-
-before(async () => { witnessJournal = await startWitnessJournalProviderProcess(); });
-after(async () => { await witnessJournal?.close(); });
 
 function request(overrides = {}) {
   return { programId: "door-controller-v1", semantics: "finite-total-relation",
@@ -39,7 +35,7 @@ function acceptance(offer, overrides = {}) {
         allowedActions: ["invoke-service", "provider-local-witness-journal-evidence"] }, ...overrides } };
 }
 async function execute(activity, operation, root) {
-  return run(activity, operation, AT, { dataRoot: root, agentUrl: witnessJournal.agentCardUrl });
+  return run(activity, operation, AT, { dataRoot: root });
 }
 
 test("finite program measurement reports bounded model and observation evidence", () => {
@@ -70,9 +66,23 @@ test("the exact RMN law closes with typed resources and WitnessJournal evidence"
   assert.equal(result.object.receipt.assetSettlementClaimed, false); assert.equal(result.object.customerMutation, false);
   assert.deepEqual(Object.keys(result.object.exchange.resources).sort(),
     ["assetAmount", "computeSeconds", "erasure", "gas", "type", "wallTimeSeconds", "wit"].sort());
-  const graphDirectory = join(root, "witnessJournal", "2026", "07", "18");
-  assert.equal(readdirSync(graphDirectory).length >= 3, true);
-  assert.equal(readFileSync(join(graphDirectory, readdirSync(graphDirectory)[0]), "utf8").includes("urn:emsenn:witness-journal:category"), true);
+  const journalPath = logPathFor(root, "finite-hoare-program-measurement", AT);
+  const rows = readEntriesAtPath(journalPath);
+  assert.equal(rows.length, 4);
+  assert.deepEqual(rows.map((row) => row.a), [
+    "finite-hoare-program-measurement-offers",
+    "finite-hoare-program-measurement-measurements",
+    "finite-hoare-program-measurement-receipts",
+    "finite-hoare-program-measurement-results",
+  ]);
+  for (const row of rows) {
+    assert.equal(row.e, row.v.id);
+    assert.deepEqual(Object.keys(row).sort(), ["a", "e", "t", "v"]);
+    assert.equal("charge" in row, false);
+    assert.equal("reading" in row, false);
+    assert.equal("settlement" in row, false);
+  }
+  assert.equal(readFileSync(journalPath, "utf8").includes("urn:emsenn:witness-journal:category"), false);
 });
 
 test("changed terms and overbroad capabilities are refused before measurement", async (t) => {
@@ -94,6 +104,11 @@ test("missing observation authority and non-ni evidence are typed refusals", asy
   assert.equal(nonstandard.type, "Reject"); assert.match(nonstandard.object.reason, /RFC6920/);
 });
 
-test("absence of the hired WitnessJournal provider fails closed", async () => {
-  await assert.rejects(run(solicitation(), "solicit-service", AT, { dataRoot: mkdtempSync(join(tmpdir(), "hoare-no-witness-journal-")) }), /WITNESS_JOURNAL_RDF_AGENT/u);
+test("the package actor owns its local atomized witness journal", async (t) => {
+  const root = mkdtempSync(join(tmpdir(), "hoare-local-witness-journal-")); t.after(() => rmSync(root, { recursive: true, force: true }));
+  const offer = await run(solicitation(), "solicit-service", AT, { dataRoot: root });
+  assert.equal(offer.type, "Offer");
+  const [row] = readEntriesAtPath(logPathFor(root, "finite-hoare-program-measurement", AT));
+  assert.equal(row.e, offer.id);
+  assert.equal(row.a, "finite-hoare-program-measurement-offers");
 });

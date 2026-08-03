@@ -15,7 +15,6 @@ import { fileURLToPath } from "node:url";
 // records on its own terms.
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const required = [
-  "AGENTS.md",
   "content/services/finite-hoare-program-measurement.json",
   "lib/schemas/finite-hoare-program-measurement-request.schema.json",
   "lib/schemas/finite-hoare-program-measurement.schema.json",
@@ -30,11 +29,18 @@ for (const path of required) {
 }
 
 const manifest = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8"));
-const enterprise = manifest["x-agentic-metro-enterprise"];
-if (enterprise?.["node-id"] !== "finite-program-measurement-service") failures.push("package node identity is absent or wrong");
-if (!enterprise?.["unimplemented-operations"]?.includes("direct-deployed-program-instrumentation")) {
-  failures.push("direct deployed-program instrumentation absence is not disclosed");
-}
+if (manifest.name !== "@lenticule-science/finite-program-measurement-service") failures.push("package node identity is absent or wrong");
+if (manifest.version !== "0.2.1") failures.push("package version is not the current semantic-address migration");
+for (const dependency of [
+  "@red-cup-engineering/semantic-content-identify-service",
+  "@red-cup-engineering/witness-journal-entry-service",
+  "@red-cup-engineering/witness-journal-log-service",
+]) if (!manifest.dependencies?.[dependency]) failures.push(`missing current dependency ${dependency}`);
+for (const displaced of [
+  "@red-cup-engineering/relation-model-notation-runtime",
+  "@red-cup-engineering/witness-journal-rdf-projection-service",
+  "@lenticule-science/witness-journal-rdf-projection-service",
+]) if (manifest.dependencies?.[displaced]) failures.push(`displaced dependency remains ${displaced}`);
 for (const path of [
   "lib/schemas/finite-hoare-program-measurement-request.schema.json",
   "lib/schemas/finite-hoare-program-measurement.schema.json",

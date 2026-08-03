@@ -1,6 +1,6 @@
 {
   "name": "@lenticule-science/finite-program-measurement-service",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "private": true,
   "type": "module",
   "description": "Measures an explicitly supplied finite total relation against optional source-digested, customer-authored observations, then appends its own result, receipt, book, event, ActivityStreams, and EAVT evidence. Use when a customer needs an exhaustive finite-model measurement over its own supplied relation without formal Lean proof and without any independent verification of the supplied observations.",
@@ -20,8 +20,9 @@
     "verify": "npm run check"
   },
   "dependencies": {
-    "@red-cup-engineering/witness-journal-rdf-projection-service": "1.1.0",
-    "@red-cup-engineering/relation-model-notation-runtime": "7.0.0"
+    "@red-cup-engineering/semantic-content-identify-service": "0.2.2",
+    "@red-cup-engineering/witness-journal-entry-service": "0.1.4",
+    "@red-cup-engineering/witness-journal-log-service": "0.1.4"
   },
   "license": "UNLICENSED"
 }

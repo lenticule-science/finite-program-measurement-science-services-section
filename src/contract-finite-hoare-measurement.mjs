@@ -4,13 +4,17 @@ import { readFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { semanticId } from "@red-cup-engineering/relation-model-notation-runtime";
-import { encodeRelationalValue } from "@red-cup-engineering/relation-model-notation-runtime/relational-value";
-import { createSettlementStore } from "@red-cup-engineering/witness-journal-rdf-projection-service/client";
+import {
+  EMPTY_WITNESS_ROOT,
+  identifyJsonSemanticContent,
+} from "@red-cup-engineering/semantic-content-identify-service";
+import { entry } from "@red-cup-engineering/witness-journal-entry-service";
+import { appendEntries } from "@red-cup-engineering/witness-journal-log-service";
 
 const CONTEXT = "https://www.w3.org/ns/activitystreams";
 const ACTOR = "urn:ame:hoare-program-measurement";
 const NODE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const JOURNAL_FEED = "finite-hoare-program-measurement";
 const EFFECTS = ["provider-local-witness-journal-evidence"];
 const FORMAL_CARRIER = {
   file: "HoareProgramMeasurement/Program.lean",
@@ -19,8 +23,11 @@ const FORMAL_CARRIER = {
 };
 
 export function semanticDigest(value) {
-  const relational = encodeRelationalValue(value);
-  return semanticId(["ascribe", relational.type, relational.term]);
+  return identifyJsonSemanticContent({
+    objectKind: "finite-program-measurement.semantic-record",
+    value,
+    witnessRoot: EMPTY_WITNESS_ROOT,
+  }).id;
 }
 function identify(body) { return { id: semanticDigest(body), ...body }; }
 function contentValid(value) { const { id: _id, ...body } = value ?? {}; return value?.id === semanticDigest(body); }
@@ -38,6 +45,13 @@ function response(type, source, object, at) {
 async function append(store, category, record) {
   await store.record({ category: `finite-hoare-program-measurement-${category}`,
     recordedAt: record.published ?? record.recordedAt, record });
+}
+function createJournalStore(root) {
+  return Object.freeze({
+    record({ category, recordedAt, record }) {
+      return appendEntries(root, JOURNAL_FEED, [entry(record.id, category, record, recordedAt)], recordedAt);
+    },
+  });
 }
 async function reject(store, source, reason, at, unmet = []) {
   const value = response("Reject", source, { type: "FiniteHoareProgramMeasurementRefusal", reason, unmet,
@@ -189,7 +203,7 @@ async function invoke(store, activity, at) {
   const startWall = process.hrtime.bigint(); const startCpu = process.cpuUsage(); const offer = activity.object.offer;
   let measurement;
   try { measurement = measureFiniteHoareProgram(offer.object.request); }
-  catch (error) { return reject(store, activity, `measurement-could-not-settle:${error.message}`, at, [error.message]); }
+  catch (error) { return reject(store, activity, `measurement-could-not-compute:${error.message}`, at, [error.message]); }
   const cpu = process.cpuUsage(startCpu);
   const resources = { type: "TypedResourceVector", computeSeconds: (cpu.user + cpu.system) / 1e6,
     wallTimeSeconds: Number(process.hrtime.bigint() - startWall) / 1e9, assetAmount: null, wit: null, erasure: null, gas: null };
@@ -206,7 +220,7 @@ async function invoke(store, activity, at) {
 
 export async function run(activity, op = "invoke-service", at = new Date().toISOString(), options = {}) {
   const dataRoot = resolve(options.dataRoot ?? process.env.HOARE_PROGRAM_MEASUREMENT_DATA_ROOT ?? join(NODE_ROOT, "data"));
-  const store = createSettlementStore({ settlementRoot: NODE_ROOT, agentUrl: options.agentUrl ?? process.env.WITNESS_JOURNAL_RDF_AGENT });
+  const store = createJournalStore(dataRoot);
   if (op === "solicit-service") return solicit(store, activity, at);
   if (op === "invoke-service") return invoke(store, activity, at);
   return reject(store, activity, `unknown-provider-operation:${op}`, at, ["operation"]);
