@@ -1,5 +1,12 @@
 # Finite Program Measurement Service
 
+<!-- 561-group-standards:badges:start -->
+[![Lenticule Science](https://img.shields.io/badge/561%20Group-Lenticule%20Science-5b4b8a)](https://github.com/lenticule-science)
+[![License: MIT](https://img.shields.io/badge/license-MIT-5b4b8a)](LICENSE)
+[![Indigenous data: CARE](https://img.shields.io/badge/Indigenous%20data-CARE-4b6f44)](https://github.com/lenticule-science/.github/blob/main/GOVERNANCE.md)
+[![Tips welcome](https://img.shields.io/badge/tips-welcome-d4a017)](https://github.com/561-group/.github/blob/main/TIPS.md)
+<!-- 561-group-standards:badges:end -->
+
 This is the application half of the former `hoare-program-measurement` micro-enterprise, split 2026-07-30 from its sibling formal library, [`hoare-program-carrier`](../hoare-program-carrier) (zero registry dependents verified before the split).
 
 This is an OSS application service, not part of the Obsmetrologia mathematics library and not itself a Lean package. It is an ActivityStreams solicitation and invocation carrier over process standard input. It measures an explicitly supplied finite total relation and optional source-digested, customer-authored observations, then appends its own result, receipt, book, event, ActivityStreams, and EAVT evidence. The finite model is measured exhaustively; the truth of supplied observations is not independently verified. Direct runtime instrumentation and network ActivityPub remain explicitly unimplemented.

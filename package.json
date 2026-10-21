@@ -24,9 +24,13 @@
     "@red-cup-engineering/witness-journal-entry-service": "0.1.4",
     "@red-cup-engineering/witness-journal-log-service": "0.1.4"
   },
-  "license": "UNLICENSED",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lenticule-science/finite-program-measurement-service.git"
+  },
+  "funding": {
+    "type": "individual",
+    "url": "https://github.com/561-group/.github/blob/main/TIPS.md"
   }
 }
