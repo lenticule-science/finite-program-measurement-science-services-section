@@ -14,3 +14,10 @@ This is an OSS application service, not part of the Obsmetrologia mathematics li
 Run `make check` (or `npm run verify`) to verify the enterprise records and elaborate the application package. The executable operations are `solicit-service` and `invoke-service`; both read one ActivityStreams JSON value from standard input.
 
 `src/verify-enterprise.mjs` only audits this half's own records now. It no longer checks `lib/ownership.json`, `lib/management/roster.json`, `content/offices/formal-program-measurer.json`, the Lean sources (`HoareProgramMeasurement.lean`, `HoareProgramMeasurement/Program.lean`, `lakefile.toml`, `lean-toolchain`), or `content/services/formal-hoare-carrier.json` and its RML law — those records and their audit now belong to `hoare-program-carrier`, which retains the enterprise's standing identity.
+
+## Code
+
+This repository holds section data only. The executable code that used to live here moved to
+[`red-cup-engineering/finite-program-measurement-service`](https://github.com/red-cup-engineering/finite-program-measurement-service) (received 2026-10-24 from
+`lenticule-science/finite-program-measurement-service@7754264a8793`). That engine reads this data from `SECTION_ROOT` (default: its current working directory),
+so point `SECTION_ROOT` at a checkout of this repository.
